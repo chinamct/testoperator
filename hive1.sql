@@ -1,0 +1,1 @@
+select * from ${hiveconf:tblname} where createdate='${hiveconf:createdate}';

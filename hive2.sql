@@ -1,0 +1,1 @@
+select * from ${tblname} where createdate='${createdate}';

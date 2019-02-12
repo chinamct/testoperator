@@ -113,15 +113,17 @@ spark_task1 = SparkSubmitOperator(
 # 使用params来指定hive脚本中的参数
 # hive脚本中的内容：
 # select * from ${tblname} where createdate='${createdate}';
+exec_date='{{ ds }}'
+
 hive_task2 = BashOperator (
     task_id='hive_task2',
     bash_command = 'hive --database {{params.database}} -f {{params.hql_file}} '
-                   '-hivevar tblname={{params.tblname}} -hivevar createdate={{params.createdate}}',
+                   '-hivevar tblname={{params.tblname}} -hivevar createdate='+exec_date,
      params = {
          'database':'security',
          'hql_file':'/Users/huiwang/airflow/dags/testoperators/hive2.sql',
-         'tblname':'scanresult',
-         'createdate': '{{ ds }}'
+         'tblname':'scanresult'
+         # 'createdate': '{{ ds }}'
      },
     queue='emr',
      dag = dag

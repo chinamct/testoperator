@@ -73,7 +73,7 @@ hive_task1 = HiveOperator(
 # application_args可用于指定pyspark脚本中自定义的参数
 _config = {
     'name': '{{ task_instance.task_id }}',
-    'application': './wordcount.py',
+    'application': '/Users/huiwang/airflow/dags/testoperators/wordcount.py',
     # 'conf': {
     #     'parquet.compression': 'SNAPPY'
     # },

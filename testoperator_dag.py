@@ -41,6 +41,7 @@ def displaydate(**kwargs):
 print_date = PythonOperator(
     task_id='print_date',
     python_callable=displaydate,
+    queue='script',
     dag=dag)
 
 # 使用HiveOperator定义执行hive脚本的任务
@@ -62,6 +63,7 @@ hive_task1 = HiveOperator(
         'tblname':'scanresult',
         'createdate': '{{ ds }}'
     },
+    queue='emr',
     dag=dag
 )
 
@@ -102,6 +104,7 @@ _config = {
 spark_task1 = SparkSubmitOperator(
     task_id='spark_task1',
     conn_id='tk-dev-emr-airflow-spark',
+    queue='emr',
     dag=dag,
     **_config
 )
@@ -120,6 +123,7 @@ hive_task2 = BashOperator (
          'tblname':'scanresult',
          'createdate': '2019-02-10'
      },
+    queue='emr',
      dag = dag
 )
 
@@ -131,6 +135,7 @@ spark_task2 = BashOperator(
     params={'name':'spark_task2'},
     # bash_command='spark-submit --class {{ params.class }} {{ params.jar }}',
     # params={'class': 'MainClassName', 'jar': '/path/to/your.jar'},
+    queue='emr',
     dag=dag
 )
 

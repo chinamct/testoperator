@@ -56,7 +56,7 @@ print_date = PythonOperator(
 hive_task1 = HiveOperator(
     task_id='hive_task1',
     hql='./hive1.sql',
-    schema='bnb_security',
+    schema='security',
     hive_cli_conn_id='tk-dev-emr-airflow-hive',
     hiveconf_jinja_translate=False,
     hiveconfs={
@@ -118,7 +118,7 @@ hive_task2 = BashOperator (
     bash_command = 'hive --database {{params.database}} -f {{params.hql_file}} '
                    '-hivevar tblname={{params.tblname}} -hivevar createdate={{params.createdate}}',
      params = {
-         'database':'bnb_security',
+         'database':'security',
          'hql_file':'/Users/huiwang/airflow/dags/testoperators/hive2.sql',
          'tblname':'scanresult',
          'createdate': '2019-02-10'

@@ -121,7 +121,7 @@ hive_task2 = BashOperator (
          'database':'security',
          'hql_file':'/Users/huiwang/airflow/dags/testoperators/hive2.sql',
          'tblname':'scanresult',
-         'createdate': '2019-02-10'
+         'createdate': '{{ ds }}'
      },
     queue='emr',
      dag = dag

@@ -6,8 +6,8 @@ from airflow.operators.hive_operator import HiveOperator
 from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-import conf
-import printdate
+import testoperator.conf as conf
+import testoperator.printdate as printdate
 
 #定义DAG默认参数。
 # 注意start_date要设置为上线前的前一天，比如2019-02-12上线运行，start_date要设置为2019-02-11，这样

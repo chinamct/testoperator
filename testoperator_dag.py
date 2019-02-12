@@ -27,7 +27,7 @@ default_args = {
 # concurrency定义了在DAG内能并发允许的任务个数。
 # schedule_interval可以采用和crontab相似的格式来指定运行的时间间隔
 # user_defined_macros 定义了公共配置，这里是在单独的conf.py定义然后导入使用的。
-dag = DAG('testoperators_dag', concurrency=6, schedule_interval=None,
+dag = DAG('testoperators_dag',concurrency=5,schedule_interval=None,
           default_args=default_args,user_defined_macros=conf.__dict__)
 
 # 定义一个空任务作为起始任务

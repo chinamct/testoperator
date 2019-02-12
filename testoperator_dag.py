@@ -31,7 +31,7 @@ dag = DAG('testoperators_dag', concurrency=4, schedule_interval=None,
           default_args=default_args,user_defined_macros=conf.__dict__)
 
 # 定义一个空任务作为起始任务
-start = DummyOperator(task_id='start', dag=dag)
+start = DummyOperator(task_id='start',queue='script',dag=dag)
 
 # 使用PythonOperator定义执行python函数的任务
 def displaydate(**kwargs):

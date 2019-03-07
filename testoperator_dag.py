@@ -6,8 +6,8 @@ from airflow.operators.hive_operator import HiveOperator
 from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
 from datetime import datetime, timedelta
 
-import conf
-import printdate
+import testoperator.conf as conf
+import testoperator.printdate as printdate
 
 #定义DAG默认参数。
 # 注意start_date要设置为上线前的前一天，比如2019-02-12上线运行，start_date要设置为2019-02-11，这样
@@ -27,11 +27,11 @@ default_args = {
 # concurrency定义了在DAG内能并发允许的任务个数。
 # schedule_interval可以采用和crontab相似的格式来指定运行的时间间隔
 # user_defined_macros 定义了公共配置，这里是在单独的conf.py定义然后导入使用的。
-dag = DAG('testoperators_dag', concurrency=4, schedule_interval=None,
+dag = DAG('testoperators',concurrency=5,schedule_interval=None,
           default_args=default_args,user_defined_macros=conf.__dict__)
 
 # 定义一个空任务作为起始任务
-start = DummyOperator(task_id='start', dag=dag)
+start = DummyOperator(task_id='start',queue='script',dag=dag)
 
 # 使用PythonOperator定义执行python函数的任务
 def displaydate(**kwargs):
@@ -56,11 +56,11 @@ print_date = PythonOperator(
 hive_task1 = HiveOperator(
     task_id='hive_task1',
     hql='./hive1.sql',
-    schema='security',
-    hive_cli_conn_id='tk-dev-emr-airflow-hive',
+    schema='testdb',
+    hive_cli_conn_id='tk_dev_dw_elastic_hive',
     hiveconf_jinja_translate=False,
     hiveconfs={
-        'tblname':'scanresult',
+        'tblname':'scanresult1',
         'createdate': '{{ ds }}'
     },
     queue='emr',
@@ -73,7 +73,7 @@ hive_task1 = HiveOperator(
 # application_args可用于指定pyspark脚本中自定义的参数
 _config = {
     'name': '{{ task_instance.task_id }}',
-    'application': './wordcount.py',
+    'application': '/server/airflow/dags/testoperator/wordcount.py',
     # 'conf': {
     #     'parquet.compression': 'SNAPPY'
     # },
@@ -85,8 +85,8 @@ _config = {
     # 'exclude_packages': 'org.bad.dependency:1.0.0',
     # 'repositories': 'http://myrepo.org',
     # 'total_executor_cores': 4,
-    'executor_cores': 1,
-    'executor_memory': '1g'
+    'executor_cores': 2,
+    'executor_memory': '12g'
     # 'keytab': 'privileged_user.keytab',
     # 'principal': 'user/spark@airflow.org',
     # 'num_executors': 10,
@@ -103,7 +103,7 @@ _config = {
 
 spark_task1 = SparkSubmitOperator(
     task_id='spark_task1',
-    conn_id='tk-dev-emr-airflow-spark',
+    conn_id='tk_dev_dw_elastic_spark',
     queue='emr',
     dag=dag,
     **_config
@@ -113,15 +113,16 @@ spark_task1 = SparkSubmitOperator(
 # 使用params来指定hive脚本中的参数
 # hive脚本中的内容：
 # select * from ${tblname} where createdate='${createdate}';
+exec_date = '{{ ds }}'
 hive_task2 = BashOperator (
     task_id='hive_task2',
     bash_command = 'hive --database {{params.database}} -f {{params.hql_file}} '
-                   '-hivevar tblname={{params.tblname}} -hivevar createdate={{params.createdate}}',
+                   '-hivevar tblname={{params.tblname}} -hivevar createdate='+exec_date,
      params = {
-         'database':'security',
-         'hql_file':'/Users/huiwang/airflow/dags/testoperators/hive2.sql',
-         'tblname':'scanresult',
-         'createdate': '2019-02-10'
+         'database':'testdb',
+         'hql_file':'/server/airflow/dags/testoperator/hive2.sql',
+         'tblname':'scanresult1'
+         #'createdate': exec_date
      },
     queue='emr',
      dag = dag
@@ -131,7 +132,7 @@ hive_task2 = BashOperator (
 # 使用params来指定pyspark主程序中的参数
 spark_task2 = BashOperator(
     task_id='spark_task2',
-    bash_command ='spark-submit --master yarn --name {{params.name}} /Users/huiwang/airflow/dags/testoperators/wordcount.py',
+    bash_command ='spark-submit --master yarn --name {{params.name}} /server/airflow/dags/testoperator/wordcount.py',
     params={'name':'spark_task2'},
     # bash_command='spark-submit --class {{ params.class }} {{ params.jar }}',
     # params={'class': 'MainClassName', 'jar': '/path/to/your.jar'},

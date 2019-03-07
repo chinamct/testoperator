@@ -1,9 +1,9 @@
 from pyspark import SparkConf, SparkContext
 import os
 
-# os.environ["PYTHONPATH"]="/anaconda3/envs/airflow/bin/python"
-# os.environ["PYSPARK_PYTHON"]="/anaconda3/envs/airflow/bin/python"
-# os.environ["PYSPARK_DRIVER_PYTHON"]="/anaconda3/envs/airflow/bin/python"
+os.environ["PYTHONPATH"]="/server/anaconda/envs/airflow/bin/python"
+os.environ["PYSPARK_PYTHON"]="/server/anaconda/envs/airflow/bin/python"
+os.environ["PYSPARK_DRIVER_PYTHON"]="/server/anaconda/envs/airflow/bin/python"
 # os.environ["SPARK_HOME"]="/usr/local/spark-2.4.0-bin-hadoop2.7"
 
 conf = SparkConf().setAppName("wordcount")
